@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.plugin)
 }
 
 android {
@@ -40,7 +42,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.11"
     }
     packaging {
         resources {
@@ -66,4 +68,22 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+
+    implementation(libs.ksp.gradlePlugin)
+    implementation(libs.ksp.api)
+    implementation(libs.ksp)
+
+    implementation(libs.timber)
+    implementation(project(":domain"))
+    implementation(project(":data"))
+
+    implementation(libs.constraintLayout.core)
+    implementation(libs.constraintLayout.compose)
+    implementation(libs.constraintLayout.compose.android)
+    implementation(libs.navigation.compose)
+    implementation(libs.hilt.navigation)
 }
