@@ -24,6 +24,7 @@ fun FavorableNewsListView(
     },
     onFavClicked: ((ArticlesItem) -> Unit)? = null,
     onUnFavClicked: ((ArticlesItem) -> Unit)? = null,
+    onItemClicked: (ArticlesItem) -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier
@@ -35,7 +36,8 @@ fun FavorableNewsListView(
             FavorableNewsItem(
                 item = item,
                 onFavClicked = onFavClicked,
-                onUnFavClicked = onUnFavClicked
+                onUnFavClicked = onUnFavClicked,
+                onItemClicked
             )
         }
     }
@@ -53,7 +55,8 @@ fun NewsListView(
             author = "test author",
             publishedAt = "published at test"
         )
-    }
+    },
+    onItemClicked: (ArticlesItem) -> Unit = {}
 ) {
     LazyColumn(
         modifier = Modifier
@@ -62,7 +65,7 @@ fun NewsListView(
     ) {
         items(itemsCount) {
             val item = getItem(it)
-            NewsItem(item = item)
+            NewsItem(item = item,onItemClicked)
         }
     }
 }
