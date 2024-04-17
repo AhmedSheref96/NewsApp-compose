@@ -8,7 +8,7 @@ using https://newsapi.org/ Api.
 
 | Dark Mode                                                    | Light Mode                                                   |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| <img align="center" src="https://github.com/AhmedSheref96/NewsApp-compose/blob/master/Screen1-dark.jpg" width="45" height="45"> | <img align="center" src="https://github.com/AhmedSheref96/NewsApp-compose/blob/master/Screen1-light.jpg" width="50%"> |
+| <img align="center" src="https://github.com/AhmedSheref96/NewsApp-compose/blob/master/Screen1-dark.jpg" width="50%"> | <img align="center" src="https://github.com/AhmedSheref96/NewsApp-compose/blob/master/Screen1-light.jpg" width="50%"> |
 
 
 ### Favorites Screen
