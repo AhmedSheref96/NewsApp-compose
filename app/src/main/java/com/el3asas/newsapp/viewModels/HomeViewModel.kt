@@ -1,5 +1,7 @@
 package com.el3asas.newsapp.viewModels
 
+import android.content.Intent
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
@@ -7,6 +9,8 @@ import com.el3asas.domain.models.ArticlesItem
 import com.el3asas.domain.useCases.GetHomeNewsUseCase
 import com.el3asas.domain.useCases.SearchNewsUseCase
 import com.el3asas.domain.useCases.UpdateOrAddArticleToLocaleDbUseCases
+import com.el3asas.newsapp.ui.screens.homeScreen.wall.WallScreenIntents
+import com.el3asas.newsapp.ui.screens.homeScreen.wall.WallScreenStates
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -27,43 +31,65 @@ class HomeViewModel @Inject constructor(
     private val updateOrAddArticleToLocaleDbUseCases: UpdateOrAddArticleToLocaleDbUseCases
 ) : ViewModel() {
 
-    var homeNews = homeNewsUseCase.invoke().cachedIn(viewModelScope)
+    val screenStates = MutableStateFlow<WallScreenStates>(WallScreenStates.Loading)
+
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
+    var searchJob: Job? = null
 
     init {
-        startSearch()
+        produceIntents(WallScreenIntents.GetWallData())
     }
 
-    fun onSearchQueryChange(newValue: String) {
-        viewModelScope.launch {
-            _searchQuery.emit(newValue)
-        }
-    }
-
-    @OptIn(FlowPreview::class)
-    private fun startSearch() {
-        viewModelScope.launch {
-            searchQuery.debounce(2000).collect {
-                homeNews = if (it.isEmpty())
-                    homeNewsUseCase.invoke().cachedIn(viewModelScope)
-                else
-                    searchNewsUseCase.invoke(it).cachedIn(viewModelScope)
-            }
-        }
-    }
-
-    private fun updateOrAddArticles(vararg articlesItem: ArticlesItem) {
-        viewModelScope.launch {
-            updateOrAddArticleToLocaleDbUseCases(*articlesItem)
-        }
-    }
-
-    fun onFavClicked(articlesItem: ArticlesItem) {
+    private fun onFavClicked(articlesItem: ArticlesItem) {
         viewModelScope.launch {
             updateOrAddArticleToLocaleDbUseCases(articlesItem.apply {
                 isFav = isFav.not()
             })
+        }
+    }
+
+    fun produceIntents(intent: WallScreenIntents) {
+        when (intent) {
+            is WallScreenIntents.GetWallData -> {
+                viewModelScope.launch {
+                    try {
+                        val data = homeNewsUseCase.invoke().cachedIn(viewModelScope)
+                        screenStates.emit(WallScreenStates.GetWallData(data))
+
+                    } catch (e: Throwable) {
+                        screenStates.emit(WallScreenStates.Error(e))
+                    }
+                }
+            }
+
+            is WallScreenIntents.AddToFavorites -> {
+                onFavClicked(intent.item)
+            }
+
+            is WallScreenIntents.GetDataFromSearch -> {
+                viewModelScope.launch {
+                    _searchQuery.emit(intent.search)
+                    searchJob?.cancel()
+                    delay(2000)
+                    searchJob = launch {
+                        try {
+                            val data =
+                                searchNewsUseCase.invoke(intent.search).cachedIn(viewModelScope)
+                            screenStates.emit(WallScreenStates.GetSearchResult(data))
+                        } catch (e: Throwable) {
+                            screenStates.emit(WallScreenStates.Error(e))
+                        }
+                    }
+                }
+            }
+
+            is WallScreenIntents.OpenArticleWebSite -> {
+                val mIntent = Intent(Intent.ACTION_VIEW).apply {
+                    setData(intent.item.url?.toUri())
+                }
+                intent.context.startActivity(mIntent)
+            }
         }
     }
 

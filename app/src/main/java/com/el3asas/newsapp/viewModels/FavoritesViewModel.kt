@@ -2,10 +2,11 @@ package com.el3asas.newsapp.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
 import com.el3asas.domain.models.ArticlesItem
 import com.el3asas.domain.useCases.GetFavoritesNewsUseCase
 import com.el3asas.domain.useCases.UpdateOrAddArticleToLocaleDbUseCases
+import com.el3asas.newsapp.ui.screens.homeScreen.favoities.FavoritesScreenIntents
+import com.el3asas.newsapp.ui.screens.homeScreen.favoities.FavoritesScreenStates
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -20,31 +21,34 @@ class FavoritesViewModel @Inject constructor(
     private val updateOrAddArticleToLocaleDbUseCases: UpdateOrAddArticleToLocaleDbUseCases
 ) : ViewModel() {
 
-    val favorites = getFavorites().cachedIn(viewModelScope)
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery = _searchQuery.asStateFlow()
-    private var searchJob: Job? = null
+    val screenState = MutableStateFlow<FavoritesScreenStates>(FavoritesScreenStates.Loading)
 
-    // TODO: handle search from locale db
-    fun onSearchQueryChange(newValue: String) {
-        viewModelScope.launch {
-            _searchQuery.emit(newValue)
-            startSearch(newValue)
-        }
+    init {
+        produceIntent(FavoritesScreenIntents.GetFavoritesItems)
     }
 
-    private fun startSearch(search: String = "") {
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            delay(500)
-        }
-    }
+    fun produceIntent(intent: FavoritesScreenIntents) {
+        when (intent) {
+            is FavoritesScreenIntents.GetFavoritesItems -> {
+                viewModelScope.launch {
+                    try {
+                        val data = getFavorites.invoke()
+                        screenState.emit(FavoritesScreenStates.GetData(data))
+                    } catch (e: Throwable) {
+                        screenState.emit(FavoritesScreenStates.Error(e))
+                    }
+                }
+            }
 
-    fun onUnFavClicked(articlesItem: ArticlesItem) {
-        viewModelScope.launch {
-            updateOrAddArticleToLocaleDbUseCases(articlesItem.apply {
-                isFav = isFav.not()
-            })
+            is FavoritesScreenIntents.DeleteFavoriteItem -> {
+                viewModelScope.launch {
+                    updateOrAddArticleToLocaleDbUseCases(
+                        articlesItem = arrayOf(intent.item.copy(isFav = false))
+                    )
+                }
+            }
+
+            is FavoritesScreenIntents.SearchFavoritesAboutNews -> {}
         }
     }
 
