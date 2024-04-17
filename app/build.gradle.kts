@@ -86,4 +86,9 @@ dependencies {
     implementation(libs.constraintLayout.compose.android)
     implementation(libs.navigation.compose)
     implementation(libs.hilt.navigation)
+
+    implementation(libs.paging3.compose)
+    implementation(libs.paging3.runtime)
+
+    implementation(libs.coil.compose)
 }

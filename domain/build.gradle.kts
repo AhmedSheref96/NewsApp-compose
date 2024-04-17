@@ -43,6 +43,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation(libs.gson)
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
@@ -50,4 +51,6 @@ dependencies {
     implementation(libs.ksp.gradlePlugin)
     implementation(libs.ksp.api)
     implementation(libs.ksp)
+    
+    implementation(libs.paging3.runtime)
 }
