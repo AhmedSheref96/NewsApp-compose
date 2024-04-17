@@ -17,7 +17,7 @@ android {
         consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String","BaseUrl","\"https://newsapi.org/v2/\"")
         // TODO: chang it to be in local.properties file when you want to secure your key.
-        buildConfigField("String","ApiKey","\"284af891f32f4a00b28febe91bc2e04b\"")
+        buildConfigField("String","ApiKey","\"d9233ce30a3b4b48a662f3f74ea75c72\"")
     }
 
     buildTypes {
