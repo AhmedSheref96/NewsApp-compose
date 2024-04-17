@@ -15,7 +15,7 @@ using https://newsapi.org/ Api.
 
 | Dark Mode                                                    | Light Mode                                                   |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| <img align="center" src="https://github.com/AhmedSheref96/NewsApp-compose/blob/master/Screen2-dark" width="50%"> | <img align="center" src="https://github.com/AhmedSheref96/NewsApp-compose/blob/master/Screen2-light.jpg" width="50%"> |
+| <img align="center" src="https://github.com/AhmedSheref96/NewsApp-compose/blob/master/Screen2-dark.jpg" width="50%"> | <img align="center" src="https://github.com/AhmedSheref96/NewsApp-compose/blob/master/Screen2-light.jpg" width="50%"> |
 
 
 **Coming Features**
