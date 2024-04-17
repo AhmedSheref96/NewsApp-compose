@@ -26,7 +26,8 @@ using https://newsapi.org/ Api.
 - [ ] Open Article in web view instead of open in browser.
 - [ ] Using splash screen api.
 - [ ] User registeration.
-- [ ] Improve UI design. 
+- [ ] Improve UI design.
+- [ ] Implement Pending Ui States.
 
 
 ## implementation
