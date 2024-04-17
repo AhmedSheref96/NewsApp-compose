@@ -91,4 +91,5 @@ dependencies {
     implementation(libs.paging3.runtime)
 
     implementation(libs.coil.compose)
+    implementation(libs.swipe)
 }
