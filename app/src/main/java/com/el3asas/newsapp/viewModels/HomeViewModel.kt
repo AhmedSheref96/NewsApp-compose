@@ -8,10 +8,14 @@ import com.el3asas.domain.useCases.GetHomeNewsUseCase
 import com.el3asas.domain.useCases.SearchNewsUseCase
 import com.el3asas.domain.useCases.UpdateOrAddArticleToLocaleDbUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,20 +30,26 @@ class HomeViewModel @Inject constructor(
     var homeNews = homeNewsUseCase.invoke().cachedIn(viewModelScope)
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
-    private var searchJob: Job? = null
+
+    init {
+        startSearch()
+    }
 
     fun onSearchQueryChange(newValue: String) {
         viewModelScope.launch {
             _searchQuery.emit(newValue)
-            startSearch(newValue)
         }
     }
 
-    private fun startSearch(search: String = "") {
-        searchJob?.cancel()
-        searchJob = viewModelScope.launch {
-            delay(500)
-            homeNews = searchNewsUseCase.invoke(search).cachedIn(viewModelScope)
+    @OptIn(FlowPreview::class)
+    private fun startSearch() {
+        viewModelScope.launch {
+            searchQuery.debounce(2000).collect {
+                homeNews = if (it.isEmpty())
+                    homeNewsUseCase.invoke().cachedIn(viewModelScope)
+                else
+                    searchNewsUseCase.invoke(it).cachedIn(viewModelScope)
+            }
         }
     }
 

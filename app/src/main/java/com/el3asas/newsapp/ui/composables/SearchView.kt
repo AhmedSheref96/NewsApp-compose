@@ -39,6 +39,7 @@ private fun SearchViewContent(value: String = "", onSearchQueryChange: (String) 
             unfocusedIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
         ),
+        maxLines = 1,
         shape = MaterialTheme.shapes.medium,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         trailingIcon = {

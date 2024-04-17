@@ -41,6 +41,7 @@ fun FavorableNewsItem(
     ),
     onFavClicked: ((ArticlesItem) -> Unit)? = null,
     onUnFavClicked: ((ArticlesItem) -> Unit)? = null,
+    onItemClick: (ArticlesItem) -> Unit = {}
 ) {
     val favSwipeAction = if (onFavClicked != null) {
         SwipeAction(
@@ -80,14 +81,14 @@ fun FavorableNewsItem(
         startActions = listOfNotNull(favSwipeAction),
         swipeThreshold = 100.dp
     ) {
-        NewsItem(item = item)
+        NewsItem(item = item, onItemClick = onItemClick)
     }
 }
 
 @Composable
 fun NewsItem(
     item: ArticlesItem = ArticlesItem(),
-    onItemClick: ((ArticlesItem) -> Unit)? = null
+    onItemClick: (ArticlesItem) -> Unit = {}
 ) {
     Card(
         modifier = Modifier

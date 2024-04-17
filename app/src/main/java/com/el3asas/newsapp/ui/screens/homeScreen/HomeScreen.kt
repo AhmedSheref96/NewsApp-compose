@@ -1,6 +1,7 @@
 package com.el3asas.newsapp.ui.screens.homeScreen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -37,7 +38,11 @@ fun HomeScreen() {
     val pagerState = rememberPagerState(initialPage = 0) {
         tabs.size
     }
-    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+    ConstraintLayout(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .fillMaxSize()
+    ) {
         val (pagerLayout, tabsLayout) = createRefs()
         HorizontalPager(
             modifier = Modifier
@@ -68,18 +73,24 @@ fun HomeScreen() {
         ) {
             tabs.forEachIndexed { index, tab ->
                 Tab(
-                    modifier = Modifier.padding(top = Margin.Medium.margin),
                     selected = index == selectedTab,
-                    selectedContentColor = MaterialTheme.colorScheme.primary,
-                    unselectedContentColor = MaterialTheme.colorScheme.inversePrimary,
+                    selectedContentColor = MaterialTheme.colorScheme.onBackground,
+                    unselectedContentColor = MaterialTheme.colorScheme.onBackground.copy(alpha = .4f),
                     onClick = {
                         selectedTab = index
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(index)
                         }
                     }) {
-                    Icon(imageVector = tab.icon, contentDescription = tab.title)
-                    Text(text = tab.title)
+                    Icon(
+                        modifier = Modifier.padding(top = Margin.Medium.margin),
+                        imageVector = tab.icon,
+                        contentDescription = tab.title
+                    )
+                    Text(
+                        modifier = Modifier.padding(bottom = Margin.Medium.margin),
+                        text = tab.title
+                    )
                 }
             }
         }
