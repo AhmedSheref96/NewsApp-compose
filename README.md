@@ -2,7 +2,7 @@
 News Application represents news list and save favorites locally.
 
 using https://newsapi.org/ Api.
-<img align="center" src ="https://res.cloudinary.com/postman/image/upload/t_team_logo/v1629869194/team/2893aede23f01bfcbd2319326bc96a6ed0524eba759745ed6d73405a3a8b67a8" width="50%">[postman collection](https://elements.getpostman.com/redirect?entityId=19417510-d67c72fb-5224-47bc-9aea-ca775aee486a&entityType=collection).
+[postman collection](https://elements.getpostman.com/redirect?entityId=19417510-d67c72fb-5224-47bc-9aea-ca775aee486a&entityType=collection).
 
 ### News Wall Screen
 
