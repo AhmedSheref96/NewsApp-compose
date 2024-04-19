@@ -8,6 +8,7 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -94,7 +95,7 @@ fun NewsItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(PaddingValues(Margin.Small.margin)),
-        onClick = { onItemClick?.invoke(item) }
+        onClick = { onItemClick.invoke(item) }
     ) {
         ConstraintLayout(modifier = Modifier.fillMaxWidth()) {
             val (title, description, image, author, publishedAt) = createRefs()
@@ -127,6 +128,7 @@ fun NewsItem(
                             end.linkTo(parent.end)
                             width = Dimension.fillToConstraints
                         },
+                    style = MaterialTheme.typography.titleMedium
                 )
 
             if (item.publishedAt.isNullOrEmpty().not())
@@ -139,7 +141,8 @@ fun NewsItem(
                             top.linkTo(title.bottom)
                             start.linkTo(parent.start)
                         },
-                    fontStyle = FontStyle.Italic
+                    fontStyle = FontStyle.Italic,
+                    style = MaterialTheme.typography.bodySmall
                 )
 
             if (item.author.isNullOrEmpty().not())
@@ -168,7 +171,8 @@ fun NewsItem(
                             bottom.linkTo(parent.bottom)
                             start.linkTo(parent.start)
                         },
-                    fontStyle = FontStyle.Italic
+                    fontStyle = FontStyle.Italic,
+                    style = MaterialTheme.typography.labelMedium
                 )
 
 
@@ -185,7 +189,8 @@ fun NewsItem(
                             width = Dimension.fillToConstraints
                         },
                     maxLines = 6,
-                    fontStyle = FontStyle.Italic
+                    fontStyle = FontStyle.Italic,
+                    style = MaterialTheme.typography.bodyMedium
                 )
 
         }
