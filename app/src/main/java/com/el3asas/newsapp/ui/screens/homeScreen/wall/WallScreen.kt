@@ -7,9 +7,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.el3asas.domain.models.ArticlesItem
 import com.el3asas.newsapp.ui.composables.FavorableNewsListView
+import com.el3asas.newsapp.ui.composables.NewsItemShimmer
+import com.el3asas.newsapp.ui.composables.NewsListShimmer
 import com.el3asas.newsapp.ui.composables.SearchView
 import com.el3asas.newsapp.viewModels.HomeViewModel
 
@@ -24,17 +27,17 @@ fun WallScreen(viewModel: HomeViewModel = hiltViewModel()) {
             val items =
                 (screenStates as WallScreenStates.GetSearchResult).data.collectAsLazyPagingItems()
             WallScreenContent(
+                items = items,
                 searchQuery = searchQuery,
                 onSearchQueryChanged = {
+                    viewModel.produceIntents(WallScreenIntents.GetDataFromAutoSearch(it))
+                },
+                onSearchClicked = {
                     viewModel.produceIntents(WallScreenIntents.GetDataFromSearch(it))
                 },
                 onItemClick = {
                     viewModel.produceIntents(WallScreenIntents.OpenArticleWebSite(context, it))
                 },
-                getItem = {
-                    items[it]!!
-                },
-                itemsCount = items.itemCount,
                 onFavClicked = {
                     viewModel.produceIntents(WallScreenIntents.AddToFavorites(it))
                 }
@@ -45,51 +48,45 @@ fun WallScreen(viewModel: HomeViewModel = hiltViewModel()) {
             val items =
                 (screenStates as WallScreenStates.GetWallData).data.collectAsLazyPagingItems()
             WallScreenContent(
+                items = items,
                 searchQuery = searchQuery,
                 onSearchQueryChanged = {
+                    viewModel.produceIntents(WallScreenIntents.GetDataFromSearch(it))
+                },
+                onSearchClicked = {
                     viewModel.produceIntents(WallScreenIntents.GetDataFromSearch(it))
                 },
                 onItemClick = {
                     viewModel.produceIntents(WallScreenIntents.OpenArticleWebSite(context, it))
                 },
-                getItem = {
-                    items[it]!!
-                },
-                itemsCount = items.itemCount,
                 onFavClicked = {
                     viewModel.produceIntents(WallScreenIntents.AddToFavorites(it))
                 }
             )
         }
 
-        else -> {}
+        is WallScreenStates.Loading -> {
+            NewsListShimmer()
+        }
+
+        is WallScreenStates.Error -> {}
     }
 
 }
 
-@Preview(showBackground = true)
 @Composable
 private fun WallScreenContent(
-    itemsCount: Int = 10,
-    getItem: (Int) -> ArticlesItem = {
-        ArticlesItem(
-            title = "title test",
-            description = "description test",
-            url = "url test",
-            author = "test author",
-            publishedAt = "published at test"
-        )
-    },
+    items: LazyPagingItems<ArticlesItem>,
     searchQuery: String = "",
     onSearchQueryChanged: (String) -> Unit = {},
     onFavClicked: (ArticlesItem) -> Unit = {},
-    onItemClick: (ArticlesItem) -> Unit = {}
+    onItemClick: (ArticlesItem) -> Unit = {},
+    onSearchClicked: (String) -> Unit = {}
 ) {
     Column {
-        SearchView(searchQuery, onSearchQueryChanged)
+        SearchView(searchQuery, onSearchQueryChanged, onSearchClicked)
         FavorableNewsListView(
-            itemsCount,
-            getItem,
+            items = items,
             onFavClicked = onFavClicked,
             onItemClicked = onItemClick
         )
