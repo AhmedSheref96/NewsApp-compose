@@ -1,98 +1,76 @@
 package com.el3asas.newsapp.ui.screens.homeScreen
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
+import androidx.compose.ui.graphics.Color
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.el3asas.newsapp.ui.screens.destinations.Destination
 import com.el3asas.newsapp.ui.screens.homeScreen.favoities.FavoritesScreen
 import com.el3asas.newsapp.ui.screens.homeScreen.wall.WallScreen
-import com.el3asas.newsapp.ui.theme.Margin
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
-    var selectedTab by remember { mutableIntStateOf(0) }
-
-    val coroutineScope = rememberCoroutineScope()
-    val tabs = listOf(
-        Tab.WallScreen, Tab.Favorites
-    )
-    val pagerState = rememberPagerState(initialPage = 0) {
-        tabs.size
-    }
-    ConstraintLayout(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize()
-    ) {
-        val (pagerLayout, tabsLayout) = createRefs()
-        HorizontalPager(
-            modifier = Modifier
-                .constrainAs(pagerLayout) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(tabsLayout.top)
-                    height = Dimension.fillToConstraints
-                    width = Dimension.matchParent
-                },
-            state = pagerState,
-            userScrollEnabled = false
-        ) { page ->
-            when (tabs[page]) {
-                is Tab.WallScreen -> WallScreen()
-                is Tab.Favorites -> FavoritesScreen()
+    val navController = rememberNavController()
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    Scaffold(
+        topBar = {
+            currentRoute?.let {
+                TopAppBar(
+                    title = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(text = Destination.getTitle(it))
+                            if (currentRoute == Destination.WallScreen.route) {
+                                IconButton(onClick = { navController.navigate(Destination.FavoritesScreen.route) }) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Favorite,
+                                        contentDescription = Destination.FavoritesScreen.route,
+                                        tint = Color.Red
+                                    )
+                                }
+                            }
+                        }
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { navController.navigateUp() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                                contentDescription = ""
+                            )
+                        }
+                    }
+                )
             }
         }
-
-
-        TabRow(
-            modifier = Modifier
-                .constrainAs(tabsLayout) {
-                    bottom.linkTo(parent.bottom)
-                    height = Dimension.wrapContent
-                    width = Dimension.matchParent
-                },
-            selectedTabIndex = selectedTab
+    ) {
+        NavHost(
+            modifier = Modifier.padding(it),
+            navController = navController,
+            startDestination = Destination.WallScreen.route
         ) {
-            tabs.forEachIndexed { index, tab ->
-                Tab(
-                    selected = index == selectedTab,
-                    selectedContentColor = MaterialTheme.colorScheme.onBackground,
-                    unselectedContentColor = MaterialTheme.colorScheme.onBackground.copy(alpha = .4f),
-                    onClick = {
-                        selectedTab = index
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(index)
-                        }
-                    }) {
-                    Icon(
-                        modifier = Modifier.padding(top = Margin.Medium.margin),
-                        imageVector = tab.icon,
-                        contentDescription = tab.title
-                    )
-                    Text(
-                        modifier = Modifier.padding(bottom = Margin.Medium.margin),
-                        text = tab.title
-                    )
-                }
-            }
+            composable(Destination.WallScreen.route) { WallScreen() }
+            composable(Destination.FavoritesScreen.route) { FavoritesScreen() }
         }
     }
 
