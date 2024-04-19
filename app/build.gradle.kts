@@ -92,4 +92,6 @@ dependencies {
 
     implementation(libs.coil.compose)
     implementation(libs.swipe)
+    implementation(libs.shimmer)
+
 }

@@ -12,15 +12,10 @@ import com.el3asas.domain.useCases.UpdateOrAddArticleToLocaleDbUseCases
 import com.el3asas.newsapp.ui.screens.homeScreen.wall.WallScreenIntents
 import com.el3asas.newsapp.ui.screens.homeScreen.wall.WallScreenStates
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,7 +30,7 @@ class HomeViewModel @Inject constructor(
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
-    var searchJob: Job? = null
+    private var searchJob: Job? = null
 
     init {
         produceIntents(WallScreenIntents.GetWallData())
@@ -44,7 +39,7 @@ class HomeViewModel @Inject constructor(
     private fun onFavClicked(articlesItem: ArticlesItem) {
         viewModelScope.launch {
             updateOrAddArticleToLocaleDbUseCases(articlesItem.apply {
-                isFav = isFav.not()
+                isFav = true
             })
         }
     }
@@ -56,7 +51,6 @@ class HomeViewModel @Inject constructor(
                     try {
                         val data = homeNewsUseCase.invoke().cachedIn(viewModelScope)
                         screenStates.emit(WallScreenStates.GetWallData(data))
-
                     } catch (e: Throwable) {
                         screenStates.emit(WallScreenStates.Error(e))
                     }
@@ -71,16 +65,16 @@ class HomeViewModel @Inject constructor(
                 viewModelScope.launch {
                     _searchQuery.emit(intent.search)
                     searchJob?.cancel()
+                    search(intent.search)
+                }
+            }
+
+            is WallScreenIntents.GetDataFromAutoSearch -> {
+                viewModelScope.launch {
+                    _searchQuery.emit(intent.search)
+                    searchJob?.cancel()
                     delay(2000)
-                    searchJob = launch {
-                        try {
-                            val data =
-                                searchNewsUseCase.invoke(intent.search).cachedIn(viewModelScope)
-                            screenStates.emit(WallScreenStates.GetSearchResult(data))
-                        } catch (e: Throwable) {
-                            screenStates.emit(WallScreenStates.Error(e))
-                        }
-                    }
+                    search(intent.search)
                 }
             }
 
@@ -91,6 +85,23 @@ class HomeViewModel @Inject constructor(
                 intent.context.startActivity(mIntent)
             }
         }
+    }
+
+    private fun search(search: String) {
+        viewModelScope.launch {
+            searchJob = launch {
+                try {
+                    val data = if (search.isEmpty())
+                        homeNewsUseCase.invoke().cachedIn(viewModelScope)
+                    else
+                        searchNewsUseCase.invoke(search).cachedIn(viewModelScope)
+                    screenStates.emit(WallScreenStates.GetSearchResult(data))
+                } catch (e: Throwable) {
+                    screenStates.emit(WallScreenStates.Error(e))
+                }
+            }
+        }
+
     }
 
 }

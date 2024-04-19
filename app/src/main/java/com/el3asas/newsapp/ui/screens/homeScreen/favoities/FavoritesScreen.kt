@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.el3asas.domain.models.ArticlesItem
 import com.el3asas.newsapp.ui.composables.FavorableNewsListView
@@ -25,8 +26,7 @@ fun FavoritesScreen(viewModel: FavoritesViewModel = hiltViewModel()) {
             val context = LocalContext.current
             Column {
                 FavoritesScreenContent(
-                    items.itemCount,
-                    getItem = { items[it]!! },
+                    items = items,
                     onUnFavClicked = {
                         viewModel.produceIntent(FavoritesScreenIntents.DeleteFavoriteItem(it))
                     },
@@ -44,25 +44,14 @@ fun FavoritesScreen(viewModel: FavoritesViewModel = hiltViewModel()) {
     }
 }
 
-@Preview(showBackground = true)
 @Composable
 private fun FavoritesScreenContent(
-    itemsCount: Int = 10,
-    getItem: (Int) -> ArticlesItem = {
-        ArticlesItem(
-            title = "title test",
-            description = "description test",
-            url = "url test",
-            author = "test author",
-            publishedAt = "published at test"
-        )
-    },
+    items:LazyPagingItems<ArticlesItem>,
     onUnFavClicked: ((ArticlesItem) -> Unit)? = null,
     onItemClick: (ArticlesItem) -> Unit = {}
 ) {
     FavorableNewsListView(
-        itemsCount = itemsCount,
-        getItem = getItem,
+        items = items,
         onUnFavClicked = onUnFavClicked,
         onItemClicked = onItemClick
     )

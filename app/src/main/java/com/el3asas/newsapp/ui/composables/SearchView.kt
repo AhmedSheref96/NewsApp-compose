@@ -2,6 +2,7 @@ package com.el3asas.newsapp.ui.composables
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
@@ -20,13 +21,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.el3asas.newsapp.ui.theme.Margin
 
 @Composable
-fun SearchView(value: String = "", onSearchQueryChange: (String) -> Unit = {}) {
-    SearchViewContent(value, onSearchQueryChange)
+fun SearchView(
+    value: String = "",
+    onSearchQueryChange: (String) -> Unit = {},
+    onSearchClicked: (String) -> Unit = {}
+) {
+    SearchViewContent(value, onSearchQueryChange, onSearchClicked)
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun SearchViewContent(value: String = "", onSearchQueryChange: (String) -> Unit = {}) {
+private fun SearchViewContent(
+    value: String = "",
+    onSearchQueryChange: (String) -> Unit = {},
+    onSearchClicked: (String) -> Unit = {}
+) {
     TextField(
         modifier = Modifier
             .fillMaxWidth()
@@ -42,12 +51,17 @@ private fun SearchViewContent(value: String = "", onSearchQueryChange: (String) 
         maxLines = 1,
         shape = MaterialTheme.shapes.medium,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                onSearchClicked(value)
+            }
+        ),
         trailingIcon = {
             if (value.isEmpty().not())
                 IconButton(content = {
                     Icon(imageVector = Icons.Rounded.Clear, contentDescription = "clear")
                 }, onClick = {
-                    onSearchQueryChange("")
+                    onSearchClicked("")
                 })
         },
         leadingIcon = {
