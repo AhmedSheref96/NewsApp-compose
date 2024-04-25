@@ -51,11 +51,12 @@ fun FavorableNewsItem(
                 Icon(
                     modifier = Modifier.padding(horizontal = 20.dp),
                     imageVector = Icons.Rounded.Favorite,
+                    tint = MaterialTheme.colorScheme.onBackground,
                     contentDescription = ""
                 )
             },
             weight = 1.0,
-            background = Color.Green,
+            background = Color.Green.copy(alpha = .7f),
             isUndo = false
         )
     } else null
@@ -67,11 +68,12 @@ fun FavorableNewsItem(
                     Icon(
                         modifier = Modifier.padding(horizontal = 20.dp),
                         imageVector = Icons.Rounded.Delete,
+                        tint = MaterialTheme.colorScheme.onBackground,
                         contentDescription = ""
                     )
                 },
                 weight = 1.0,
-                background = Color.Red,
+                background = Color.Red.copy(alpha = .7f),
                 isUndo = false
             )
 
@@ -80,6 +82,7 @@ fun FavorableNewsItem(
     SwipeableActionsBox(
         endActions = listOfNotNull(unFavSwipeAction),
         startActions = listOfNotNull(favSwipeAction),
+        backgroundUntilSwipeThreshold = MaterialTheme.colorScheme.background,
         swipeThreshold = 100.dp
     ) {
         NewsItem(item = item, onItemClick = onItemClick)
